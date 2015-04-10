@@ -1,0 +1,42 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Brogue.Engine;
+using Brogue.Mapping;
+
+namespace Brogue.EnviromentObjects.Interactive
+{
+    class Stairs : IEnvironmentObject, IInteractable, IRenderable
+    {
+        static DynamicTexture texture = Engine.Engine.GetTexture("Enviroment/StairsDesent");
+
+        public bool isSolid { get; set; }
+
+        public bool calledNextLevel { get; set; }
+
+        public Stairs() 
+        {
+            isSolid = true;
+            calledNextLevel = false;
+        }
+
+        public bool IsSolid()
+        {
+            return isSolid;
+        }
+
+        public Sprite GetSprite()
+        {
+            return new Sprite(texture);
+        }
+
+        public void actOn(GameCharacter actingCharacter)
+        {
+            Audio.playSound("stairs");
+            Engine.Engine.NextLevel();
+            calledNextLevel = true;
+            Audio.playRandomSong();
+        }
+    }
+}

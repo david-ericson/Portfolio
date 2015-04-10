@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <BaseOutput>$(SolutionDir)\Temp\$(Configuration)\Bin\$(ProjectName)</BaseOutput>
+    <SubFolder>Temp\$(Configuration)\Bin\$(ProjectName)\$(ProjectName)</SubFolder>
+    <InterOutput>$(SolutionDir)\Temp\$(Configuration)\Intermediates\$(ProjectName)</InterOutput>
+    <LibOutput>$(SolutionDir)Temp\$(Configuration)\Lib\$(ProjectName)</LibOutput>
+    <GameOutput>$(SolutionDir)Temp\$(Configuration)\Game\</GameOutput>
+    <BinGame>$(BaseOutput)\..\Game</BinGame>
+    <BaseAssetOutput>$(SolutionDir)\Temp\$(Configuration)\Bin\Assets</BaseAssetOutput>
+    <GameAssetOutput>$(SolutionDir)\Temp\$(Configuration)\Game\Assets</GameAssetOutput>
+    <OldGame>$(SolutionDir)\Game</OldGame>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutDir>$(BaseOutput)</OutDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <IntDir>$(InterOutput)</IntDir>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <CustomBuildStep>
+      <Message>
+      </Message>
+    </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>if not exist "$(LibOutput)\..\Engine"  (mkdir "$(LibOutput)\..\Engine")
+if exist "$(BaseOutput)\"*.lib (move /y "$(BaseOutput)\Engine.lib" "$(LibOutput)\" )
+if exist   "$(SolutionDir)$(Configuration)\"*.lib (xcopy "$(SolutionDir)$(Configuration)\"*.lib "$(LibOutput)\"  /y)
+if exist "$(BaseOutput)\"*.exp (move /y "$(BaseOutput)\"*.exp "$(InterOutput)" )
+if not exist "$(GameOutput)" (mkdir "$(GameOutput)")
+if exist "$(SolutionDir)$(Configuration)\"*.dll (xcopy "$(SolutionDir)$(Configuration)\"*.dll "$(GameOutput)" /y)
+if exist  "$(BaseOutput)\..\Engine\"*.dll  (xcopy "$(BaseOutput)\..\Engine\"*.dll "$(GameOutput)" /y)
+if exist "$(OldGame)\DataParser.exe" (xcopy "$(OldGame)\DataParser.exe" "$(GameOutput)" /y)
+if exist "$(BaseOutput)\..\Game\"*.exe ( xcopy "$(BaseOutput)\..\Game\"*.exe "$(GameOutput)" /y  )
+if not exist "$(GameAssetOutput)" (mkdir "$(GameAssetOutput)")
+if not exist "$(GameAssetOutput)\Textures" (mkdir "$(GameAssetOutput)\Textures")
+if not exist "$(GameAssetOutput)\OBJs" (mkdir "$(GameAssetOutput)\OBJs")
+if not exist "$(GameAssetOutput)\Shaders" (mkdir "$(GameAssetOutput)\Shaders")
+if exist "$(OldGame)\Textures" (xcopy "$(OldGame)\Textures" "$(GameAssetOutput)\Textures" /y /s)
+if exist "$(OldGame)\OBJs" (xcopy "$(OldGame)\OBJs" "$(GameAssetOutput)\OBJs" /y /s)
+if exist "$(OldGame)\Shaders" (xcopy "$(OldGame)\Shaders" "$(GameAssetOutput)\Shaders" /y /s)
+</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Creating Lib Folder</Message>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)Temp\$(Configuration)\Lib\Engine;$(SolutionDir)Temp\$(Configuration)\Lib\Game</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="BaseOutput">
+      <Value>$(BaseOutput)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SubFolder">
+      <Value>$(SubFolder)</Value>
+    </BuildMacro>
+    <BuildMacro Include="InterOutput">
+      <Value>$(InterOutput)</Value>
+    </BuildMacro>
+    <BuildMacro Include="LibOutput">
+      <Value>$(LibOutput)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GameOutput">
+      <Value>$(GameOutput)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BinGame">
+      <Value>$(BinGame)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BaseAssetOutput">
+      <Value>$(BaseAssetOutput)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GameAssetOutput">
+      <Value>$(GameAssetOutput)</Value>
+    </BuildMacro>
+    <BuildMacro Include="OldGame">
+      <Value>$(OldGame)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

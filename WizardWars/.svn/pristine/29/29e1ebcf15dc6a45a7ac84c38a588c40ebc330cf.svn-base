@@ -1,0 +1,83 @@
+﻿using UnityEngine;
+using UnityEngine;
+using System.Collections;
+
+public class ZappityZapZapMissileProjectile : Projectile {
+    
+    
+    // Use this for initialization
+    public override void Start () {
+        coolDownTimer = bullet.coolDown;
+        
+       // Material m = this.gameObject.renderer.material;
+        if(owner != null)
+        {
+            print("Set material.");
+            Material m = owner.renderer.material;   
+
+            bullet.gameObject.renderer.material = m;
+           
+           
+        }
+        //bullet.gameObject.renderer.material = owner.renderer.material;
+    }
+
+    public override int getTeamNumber()
+    {
+        return owner.GetComponent<Character>().teamNum;
+    }
+    
+    public override void Fire(Vector2 dir)
+    {
+        if (coolDownTimer >= bullet.coolDown) {
+            GameObject getSound=GameObject.Find("SoundManager");
+            SoundManager SM=getSound.GetComponent<SoundManager>();
+            SM.playZap();
+
+            Vector2 perpDir=new Vector2(-dir.y, dir.x);
+            Vector2 firstVector=dir+(perpDir*-0.1f);
+            Vector2 secondVector=dir+(perpDir*0.1f);
+            Vector2 thirdVector=dir+(perpDir*-0.5f);
+            Vector2 fourthVector=dir+(perpDir*0.5f);
+
+            Magic clone = (Magic)Instantiate (bullet, owner.transform.position + (new Vector3 (firstVector.normalized.x, firstVector.normalized.y, 0.0f) * 1.2f), owner.transform.rotation);
+            clone.gameObject.renderer.material = owner.renderer.material;
+            clone.gameObject.renderer.material.color = owner.GetComponent<Character>().baseColor;
+
+            ParticleSystem g = (ParticleSystem)Instantiate(clone.onCollisionEffect, owner.transform.position + (new Vector3(dir.x * 2, dir.y * 2, 0)), Quaternion.LookRotation(new Vector3(dir.x, dir.y, 0)));
+            Destroy(g.gameObject, clone.onCollisionEffect.duration);
+
+            Magic clone2 = (Magic)Instantiate (bullet, owner.transform.position + (new Vector3 (secondVector.normalized.x, secondVector.normalized.y, 0.0f) * 1.2f), owner.transform.rotation);
+            clone2.gameObject.renderer.material = owner.renderer.material;
+            clone2.gameObject.renderer.material.color = owner.GetComponent<Character>().baseColor;
+            
+            Magic clone3 = (Magic)Instantiate (bullet, owner.transform.position + (new Vector3 (thirdVector.normalized.x, thirdVector.normalized.y, 0.0f) * 1.2f), owner.transform.rotation);
+            clone3.gameObject.renderer.material = owner.renderer.material;
+            clone3.gameObject.renderer.material.color = owner.GetComponent<Character>().baseColor;
+            
+            Magic clone4 = (Magic)Instantiate (bullet, owner.transform.position + (new Vector3 (fourthVector.normalized.x, fourthVector.normalized.y, 0.0f) * 1.2f), owner.transform.rotation);
+            clone4.gameObject.renderer.material = owner.renderer.material;
+            clone4.gameObject.renderer.material.color = owner.GetComponent<Character>().baseColor;
+            
+            clone.rigidbody.velocity = firstVector.normalized;
+            clone.characterNumber=((Controller)owner.GetComponent("Controller")).getCharacter();
+
+            clone2.rigidbody.velocity = secondVector.normalized;
+            clone2.characterNumber=((Controller)owner.GetComponent("Controller")).getCharacter();
+            
+            clone3.rigidbody.velocity = thirdVector.normalized;
+            clone3.characterNumber=((Controller)owner.GetComponent("Controller")).getCharacter();
+            
+            clone4.rigidbody.velocity = fourthVector.normalized;
+            clone4.characterNumber=((Controller)owner.GetComponent("Controller")).getCharacter();
+            coolDownTimer=0;
+        }
+    }
+    
+    // Update is called once per frame
+    public override void Update ()
+    {
+        coolDownTimer += Time.deltaTime;
+        //Fire (new Vector2 (0.0f, 1.0f));
+    }
+}

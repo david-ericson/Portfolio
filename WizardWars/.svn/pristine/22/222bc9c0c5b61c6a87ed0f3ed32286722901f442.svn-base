@@ -1,0 +1,159 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class Rune : MonoBehaviour {
+	public  Projectile[] weapons;
+    public Mesh[] swapObject;
+    public float spawnTime;
+    private float currTime;
+	private Vector3 start, end;
+	private float beta, increment;
+	private Projectile weapon;
+    private float tempY;
+    private float bobSpeed = 1;
+    private bool fireBlastRotate;
+	
+	// Use this for initialization
+	void Start () {
+		start = gameObject.transform.position;
+		end = start + new Vector3(0, 2, 0);
+		beta = 0;
+		increment = .02f;
+        currTime = spawnTime;
+        int test = Random.Range(0, weapons.Length);
+        this.gameObject.renderer.enabled = true;
+        this.gameObject.collider.enabled = true;
+		weapon = weapons[test];
+		weapon.Start();
+		this.gameObject.GetComponent<Light>().color = new Color(weapon.runeColor.r, weapon.runeColor.g, weapon.runeColor.b, .5f);
+        this.gameObject.GetComponent<MeshFilter>().mesh = swapObject[test];
+        fireBlastRotate = (test == 2);
+        if (!fireBlastRotate)
+        {
+            transform.Rotate(new Vector3(0, 90, 0));
+        }
+        tempY = Random.value * 50;
+		
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		if (!this.gameObject.renderer.enabled)
+        {
+            currTime -= Time.deltaTime;
+        }
+        if (currTime <= 0)
+        {
+            Reset();
+        }
+
+        Bob();
+	}
+
+    void Bob()
+    {
+
+
+        if (!GameManager.isPaused)
+        {
+            Vector3 thePosition = rigidbody.position;
+            
+            float diff = (Mathf.Sin(tempY))/450;
+            
+            thePosition.y += diff;
+
+            tempY += bobSpeed * Time.deltaTime;
+
+            rigidbody.position = thePosition;
+        }
+
+    }
+	
+	void OnTriggerEnter(Collider col)
+	{
+		Character wizard = col.gameObject.GetComponent<Character>();
+		if(wizard != null && this.gameObject.renderer.enabled)
+		{
+            this.gameObject.renderer.enabled = false;
+            this.gameObject.collider.enabled = false;
+            this.gameObject.GetComponent<Light>().color = new Color(0,0,0,0);
+			weapon.owner = wizard.gameObject;
+			wizard.gameObject.GetComponent<CharacterProjectile>().p = (Projectile)Instantiate(weapon);
+            wizard.gameObject.GetComponent<Light>().color = new Color(weapon.runeColor.r, weapon.runeColor.g, weapon.runeColor.b);
+            wizard.runeRepresentation.rune=this.gameObject.GetComponent<MeshFilter>().mesh;
+           
+            tempY = Random.value * 50;
+			//weapon.Start();
+		}
+	}
+	
+	int findRune(Dictionary<Projectile, float> spawnChance, float number)
+	{
+		int index = -1;
+		float maxVal = 0;
+		for(int i=0; i<weapons.Length && index == -1; i++)
+		{
+			maxVal += spawnChance[weapons[i]];
+			print (maxVal);
+			if(maxVal > number)
+			{
+				index = i;
+			}
+		}
+		print (weapons[index].ToString());
+		return index;
+	}
+
+    void Reset()
+    {
+    	Rune[] runes = GameObject.FindObjectsOfType<Rune>();
+    	Dictionary<Projectile, float> spawnChance = new Dictionary<Projectile, float>();
+    	Dictionary<Projectile, int> runeCount = new Dictionary<Projectile, int>();
+    	foreach(Projectile p in weapons)
+    	{
+    		runeCount.Add(p, 0);
+    	}
+    	foreach(Rune r in runes)
+    	{
+    		if(r.renderer.isVisible)
+    		{
+    			runeCount[r.weapon]++;
+    		}
+    	}
+    	float totalSpawnChance = 0;
+    	for(int i=0; i<weapons.Length; i++)
+    	{
+    		if(!spawnChance.ContainsKey(weapons[i]))
+    		{
+    			spawnChance.Add(weapons[i], 0);
+    		}
+    		spawnChance[weapons[i]] = (float)(100/weapons.Length)/(Mathf.Pow (2, runeCount[weapons[i]]));
+    		print(spawnChance[weapons[i]] + " weapon type: " + weapons[i].ToString());
+    		totalSpawnChance+= spawnChance[weapons[i]];
+    	}
+    	print (totalSpawnChance);
+        rigidbody.position = start;
+        currTime = spawnTime;
+        float number = Random.Range(0.0f, totalSpawnChance);
+        this.gameObject.renderer.enabled = true;
+        this.gameObject.collider.enabled = true;
+        int test = findRune(spawnChance, number);
+        print (number);
+        weapon = weapons[test];
+        weapon.Start();
+        this.gameObject.GetComponent<Light>().color = new Color(weapon.runeColor.r, weapon.runeColor.g, weapon.runeColor.b, .5f);
+        this.gameObject.GetComponent<MeshFilter>().mesh = swapObject[test];
+        if (test == 2 && !fireBlastRotate)
+        {
+            transform.Rotate(new Vector3(0, -90, 0));
+            fireBlastRotate=true;
+        }
+        else if(test!=2 && fireBlastRotate)
+        {
+            transform.Rotate(new Vector3(0, 90, 0));
+            fireBlastRotate=false;
+        }
+        tempY = Random.value * 50;
+    }
+}

@@ -1,0 +1,177 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class GameManager : MonoBehaviour {
+	public float startingTime;
+	
+	private float currentTime;
+	private GUIStyle timerStyle, counterStyle, winStyle;
+	private Character[] players;
+	public GameObject[] spawnPoints;
+	private static GameManager me;
+	// Use this for initialization
+	void Start () {
+		me = this;
+		startingTime *= 60;
+		currentTime = startingTime;
+		timerStyle = new GUIStyle();
+		counterStyle = new GUIStyle();
+		winStyle = new GUIStyle();
+		timerStyle.fontSize = 25;
+		counterStyle.fontSize = 45;
+		winStyle.fontSize = 35;
+		timerStyle.normal.textColor = Color.white;
+		counterStyle.normal.textColor = Color.red;
+		winStyle.normal.textColor = Color.white;
+	}
+	
+	public static void randomizeSpawn(Character c)
+	{
+		for(int i=0; i<me.players.Length; i++)
+		{
+			Character player = me.players[i].GetComponent<Character>();
+			if(player == c)
+			{
+				player.setSpawn(me.spawnPoints[Random.Range(0, me.spawnPoints.Length)].transform.position)	;
+			}
+		}
+	}
+	
+	public static Character getPlayer(int playerId)
+	{
+		Character ret = null;
+		foreach(Character p in me.players)
+		{
+			if(p.getId() == playerId)
+			{
+				ret = p;
+			}
+		}
+		return ret;
+	}
+	
+	
+	// Update is called once per frame
+	void Update () {
+		if(currentTime == startingTime)
+		{
+			Object[] objects = GameObject.FindObjectsOfType(typeof(Character));
+			players = new Character[objects.Length];
+			for(int i=0; i<objects.Length; i++)
+			{
+				players[i] = (Character)objects[i];
+			}
+			GameObject[] spawns = GameObject.FindGameObjectsWithTag("SpawnPoint");
+			spawnPoints = new GameObject[spawns.Length];
+			spawnPoints = spawns;
+		}
+		if(currentTime > 0)
+		{
+			currentTime -= Time.deltaTime;
+		}
+		else
+		{
+			foreach (Character c in players) {
+				c.setInvincible(true);
+			}
+		}
+		if(Input.GetKeyDown(KeyCode.Space))
+		{
+			Restart();
+		}
+	}
+	
+	void Restart () 
+	{
+		currentTime = startingTime;
+		foreach(Character c in players)
+		{
+			c.setInvincible(false);
+			c.Restart();
+		}
+	}
+	
+	int[] nabBestPlayer()
+	{
+		int highestKills = -1;
+		List<int> indices = new List<int>();
+		foreach(Character c in players)
+		{
+			if(c.getNumKills() > highestKills)
+			{
+				highestKills = c.getNumKills();
+				indices.Clear();
+				indices.Add(c.getId()+1);
+			}
+			else if(c.getNumKills() == highestKills)
+			{
+				indices.Add(c.getId()+1);
+			}
+		}
+		return indices.ToArray();
+	}
+	
+	void OnGUI()
+	{
+		int minutes = (int)(currentTime/60);
+		int seconds = (int)(currentTime - minutes*60);
+		string secondsString = (seconds < 10)?"0"+seconds:""+seconds;
+		
+		GUI.Box(new Rect((3*Screen.width/8),10,100,20), "Time Remaining "+minutes+":"+secondsString, timerStyle);
+		int width = 80;
+		int height = 40;
+		if(players.Length > 0)
+		{
+            Color c = GameManager.getPlayer(0).renderer.material.color;
+
+			counterStyle.normal.textColor = new Color(c.r,c.g,c.b,1.0f);
+			int numKills = GameManager.getPlayer(0).getNumKills();
+			
+			GUI.Box(new Rect(0, height,width,height), "");
+			GUI.Box(new Rect(0,height,width,height), ""+numKills, counterStyle);
+			
+			if(players.Length > 1)
+			{
+                c = GameManager.getPlayer(1).renderer.material.color;
+                
+                counterStyle.normal.textColor = new Color(c.r,c.g,c.b,1.0f);
+				numKills = GameManager.getPlayer(1).getNumKills();
+				
+				GUI.Box(new Rect(Screen.width-width, height, width, height), "");
+				GUI.Box(new Rect(Screen.width-width, height, width, height), ""+numKills, counterStyle);
+				if(players.Length > 2)
+				{
+                    c = GameManager.getPlayer(2).renderer.material.color;
+                    
+                    counterStyle.normal.textColor = new Color(c.r,c.g,c.b,1.0f);
+					numKills = GameManager.getPlayer(2).getNumKills();
+					
+					GUI.Box(new Rect(0, Screen.height-(2*height), width, height), "");
+					GUI.Box(new Rect(0, Screen.height-(2*height), width, height), ""+numKills, counterStyle);
+					if(players.Length > 3)
+					{
+                        c = GameManager.getPlayer(3).renderer.material.color;
+                        
+                        counterStyle.normal.textColor = new Color(c.r,c.g,c.b,1.0f);
+						numKills = GameManager.getPlayer(3).getNumKills();
+						
+						GUI.Box(new Rect(Screen.width-width, Screen.height-(2*height), width, height), "");
+						GUI.Box(new Rect(Screen.width-width, Screen.height-(2*height), width, height), ""+numKills, counterStyle);
+					}
+				}
+			}
+		}
+		if(currentTime <= 0)
+		{
+			int[] topPlayers = nabBestPlayer();
+			for(int i=0; i<topPlayers.Length; i++)
+			{
+	            Color c = GameManager.getPlayer(topPlayers[i]-1).renderer.material.color;
+	            
+	            winStyle.normal.textColor = new Color(c.r,c.g,c.b,1.0f);
+				GUI.TextField(new Rect((int)(3*Screen.width/8), (int)(3*Screen.height/8)+i*winStyle.fontSize, 100, 20), "Player "+topPlayers[i]+" Wins!!!", winStyle);
+			}
+		}
+	}
+}

@@ -1,0 +1,48 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class Fireblast : Projectile {
+
+	// Use this for initialization
+	public override void Start () {
+		coolDownTimer = bullet.coolDown;
+		runeColor = new Color(1.0f, .5f, 0);
+		if(owner != null)
+		{
+			Material m = owner.renderer.material;
+			bullet.gameObject.renderer.material = owner.renderer.material;
+		}
+	}
+
+    public override int getTeamNumber()
+    {
+        return owner.GetComponent<Character>().teamNum;
+    }
+	
+	// Update is called once per frame
+	public override void Update ()
+	{
+		coolDownTimer += Time.deltaTime;
+		//Fire (new Vector2 (0.0f, 1.0f));
+	}
+	
+	public override void Fire(Vector2 dir)
+	{
+		if (coolDownTimer >= bullet.coolDown) {
+			Vector2 start = new Vector2(1, 0);
+            int count = 16;
+			for(int i=0; i<count; i++)
+			{
+				Vector3 myDir = new Vector3(start.x, start.y, 0)*1.2f;
+				myDir = Quaternion.Euler(0, 0, i*(360/count))*myDir;
+				Magic clone = (Magic)Instantiate (bullet, owner.transform.position + myDir, owner.transform.rotation);
+				clone.gameObject.renderer.material = owner.renderer.material;
+                clone.gameObject.renderer.material.color = owner.GetComponent<Character>().baseColor;
+
+				clone.rigidbody.velocity = new Vector2(myDir.x, myDir.y).normalized;
+				clone.characterNumber=((Controller)owner.GetComponent("Controller")).getCharacter();
+				coolDownTimer=0;
+			}
+		}
+	}
+}

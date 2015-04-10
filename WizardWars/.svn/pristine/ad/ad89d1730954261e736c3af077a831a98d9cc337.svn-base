@@ -1,0 +1,10 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public abstract class Projectile : MonoBehaviour {
+
+	public Magic bullet;
+	protected float coolDownTimer;
+
+	public abstract void Fire (Vector2 dir);
+}

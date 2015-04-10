@@ -1,0 +1,16 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Character.cs">
+    <Files>
+      <File FileName="Assets\Controller.cs" Line="238" Column="69" />
+      <File FileName="Assets\Character.cs" Line="243" Column="15" />
+      <File FileName="Assets\LighteningSpawn.cs" Line="1" Column="1" />
+      <File FileName="Assets\DoorScript.cs" Line="25" Column="1" />
+      <File FileName="Assets\MenuSystem.cs" Line="398" Column="7" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

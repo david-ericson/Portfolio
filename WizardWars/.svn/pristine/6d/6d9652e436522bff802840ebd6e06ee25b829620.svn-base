@@ -1,0 +1,111 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class MenuSystem : MonoBehaviour {
+	public string[] gamemodes;
+	public string[] levels;
+	private bool choosingGamemode;
+	private bool choosingLevel;
+	private choice[] gameChoices;
+	private choice[] levelChoices;
+	
+	struct choice 
+	{
+		public bool value;
+		public string name;
+		public string levelToLoad;
+	}
+	// Use this for initialization
+	void Start () {
+		choosingGamemode = false;
+		choosingLevel = false;
+		gameChoices = new choice[gamemodes.Length];
+		levelChoices = new choice[levels.Length];
+		for(int i=0; i<gamemodes.Length; i++)
+		{
+			gameChoices[i] = new choice();
+			gameChoices[i].value = false;
+			gameChoices[i].name = gamemodes[i];
+		}
+		for(int i=0; i<levels.Length; i++)
+		{
+			levelChoices[i] = new choice();
+			levelChoices[i].value = false;
+			string[] split = levels[i].Split('/');
+			levelChoices[i].name = split[0];
+			levelChoices[i].levelToLoad = split[1];
+		}
+		gameChoices[0].value = true;
+		levelChoices[0].value = true;
+	}
+	
+	void switchAllChoiceBools(choice[] choices, int stay)
+	{
+		for(int i=0; i<choices.Length; i++)
+		{
+			if(i != stay)
+			{
+				choices[i].value = false;
+			}
+		}
+	}
+	
+	choice getCurrChoice(choice[] choices)
+	{
+		choice ret = new choice();
+		for(int i=0; i<choices.Length; i++)
+		{
+			if(choices[i].value)
+			{
+				ret = choices[i];
+			}
+		}
+		return ret;
+	}
+	
+	// Update is called once per frame
+	void Update () {
+	
+	}
+	
+	void OnGUI()
+	{
+		int height = 20;
+		int width = 150;
+		int gap = 15;
+		int gapSoFar = 0;
+		GUI.Label(new Rect(Screen.width/10, Screen.height/10, width, height), "Choose Gamemode");
+		gapSoFar += height+gap;
+		for(int i=0; i<gameChoices.Length; i++)
+		{
+			if(GUI.Toggle(new Rect(Screen.width/10, Screen.height/10+gapSoFar, width, height), gameChoices[i].value, gameChoices[i].name))
+			{
+				gameChoices[i].value = true;
+				switchAllChoiceBools(gameChoices, i);
+			}
+			gapSoFar += height+gap;
+		}
+		GUI.Label(new Rect(Screen.width/10, Screen.height/10+gapSoFar, width, height), "Choose Level");
+		gapSoFar += height+gap;
+		for(int i=0; i<levelChoices.Length; i++)
+		{
+			if(GUI.Toggle(new Rect(Screen.width/10, Screen.height/10+gapSoFar, width, height), levelChoices[i].value, levelChoices[i].name))
+			{
+				levelChoices[i].value = true;
+				switchAllChoiceBools(levelChoices, i);
+			}
+			gapSoFar += height+gap;
+		}
+		if(GUI.Button(new Rect(Screen.width/10, Screen.height/10+gapSoFar, width, height*2), "Start Game"))
+		{
+			choice level = getCurrChoice(levelChoices);
+			Application.LoadLevel(level.levelToLoad);
+		}
+		gapSoFar += 2*height+gap;
+		/*if(GUI.Button(new Rect(Screen.width/10, Screen.height/10+gapSoFar, width, height*2), "Close"))
+		{
+			Application.Quit();
+		}*/
+	}
+}
+

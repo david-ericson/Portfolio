@@ -1,0 +1,18 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class CharacterProjectile : MonoBehaviour {
+
+	public Projectile p;
+	// Use this for initialization
+	void Start () {
+		//p.Start();
+        p = (Projectile)Instantiate(p);
+        p.Start();
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		p.Update();
+	}
+}

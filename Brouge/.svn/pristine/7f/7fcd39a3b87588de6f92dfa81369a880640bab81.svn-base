@@ -1,0 +1,29 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Brogue.Enums;
+using Brogue.Engine;
+
+namespace Brogue.Items.Equipment.Weapon.Legendary.Ranged
+{
+    [Serializable] public class KunaiWithChain : LegendaryRanged
+    {
+        public static DynamicTexture Texture { get; set; }
+
+        public override DynamicTexture GetTexture()
+        {
+            return Texture;
+        }
+
+        public KunaiWithChain(int dLevel, int cLevel)
+        {
+            Name = "Kunai With Chain";
+            FlavorText = "What is this!";
+            UsedBy = new List<Classes> { Classes.Rogue, Classes.Assassin };
+            EquipableIn = new List<Slots> { Slots.Hand_Auxillary };
+            LevelReq = findLevelReq(dLevel, cLevel);
+            Damage = findDamage(BaseDamage, dLevel, LevelReq);
+        }
+    }
+}

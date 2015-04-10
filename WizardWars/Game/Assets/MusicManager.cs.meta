@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: fc639984fcb2f754e8d90b1d5025c0ec
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - menuMusic: {fileID: 8300000, guid: 11e9756a9ea339b469a1803ac3e3b8db, type: 3}
+  - gameMusic: {fileID: 8300000, guid: 714c7810a0cc61b449a4fde0755c2bbc, type: 3}
+  - musicPlayer: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 

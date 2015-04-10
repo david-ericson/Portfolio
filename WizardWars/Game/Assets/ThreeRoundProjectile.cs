@@ -1,0 +1,65 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class ThreeRoundProjectile : Projectile {
+
+	private float miniCd;
+	private bool justFired;
+	private int count;
+	private Vector2 fireDir;
+	// Use this for initialization
+	public override void Start () {
+		coolDownTimer = bullet.coolDown;
+		miniCd = .16f; 
+		justFired = false;
+		count = 10;
+		if(owner != null)
+		{
+			Material m = owner.renderer.material;
+			bullet.gameObject.renderer.material = owner.renderer.material;
+		}
+	}
+	
+	public override int getTeamNumber()
+	{
+		return owner.GetComponent<Character>().teamNum;
+	}
+	
+	// Update is called once per frame
+	public override void Update ()
+	{
+		coolDownTimer += Time.deltaTime;
+		if(count < 3 && coolDownTimer >= miniCd)
+		{
+			justFired = true;
+			Vector2 aim = owner.GetComponent<Controller>().getAimStick()*-1; 
+			fireDir = (aim.magnitude  > .1f)?aim:fireDir; 
+			Fire (fireDir);
+			print (fireDir);
+			justFired = false;
+		}
+	}
+	
+	public override void Fire(Vector2 dir)
+	{
+		if (coolDownTimer >= bullet.coolDown || justFired) {
+			GameObject getSound=GameObject.Find("SoundManager");
+			SoundManager SM=getSound.GetComponent<SoundManager>();
+			//SM.playFireBallExplosion();
+			fireDir = dir;
+			Vector2 start = new Vector2(1, 0);
+			Magic clone = (Magic)Instantiate (bullet, owner.transform.position + (new Vector3 (dir.normalized.x, dir.normalized.y, 0.0f) * 0.8f), owner.transform.rotation);
+			
+			clone.renderer.material = owner.renderer.material;
+			clone.rigidbody.velocity = dir.normalized;
+			clone.characterNumber=((Controller)owner.GetComponent("Controller")).getCharacter();
+            clone.gameObject.GetComponentInChildren<TrailRenderer>().material.SetColor("_TintColor", owner.GetComponent<Character>().baseColor);
+			coolDownTimer=0;
+			if(!justFired)
+			{
+				count = 0;
+			}
+			count++;
+		}
+	}
+}

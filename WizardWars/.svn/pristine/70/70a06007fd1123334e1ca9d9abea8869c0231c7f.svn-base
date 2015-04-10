@@ -1,0 +1,26 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class LightFlicker : MonoBehaviour {
+
+    private float offsetDelta = .05f;
+    private float dumb = 0;
+    private float startingInsensity;
+	// Use this for initialization
+	void Start () 
+    {
+        startingInsensity = GetComponentInChildren<Light>().intensity;
+        dumb = Random.value * 3;
+        print(dumb);
+	}
+	
+	// Update is called once per frame
+	void Update () 
+    {
+        float offset = (Mathf.Sin(dumb)/3) + .25f;
+
+        GetComponentInChildren<Light>().intensity = startingInsensity + offset;
+
+        dumb += offsetDelta;
+	}
+}

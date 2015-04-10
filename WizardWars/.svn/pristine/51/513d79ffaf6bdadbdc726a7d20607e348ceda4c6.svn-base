@@ -1,0 +1,85 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class Rune : MonoBehaviour {
+	public  Projectile[] weapons;
+    public float spawnTime;
+    private float currTime;
+	private Vector3 start, end;
+	private float beta, increment;
+	private Projectile weapon;
+    private float tempY;
+    private float bobSpeed = .006f;
+	
+	// Use this for initialization
+	void Start () {
+		start = gameObject.transform.position;
+		end = start + new Vector3(0, 2, 0);
+		beta = 0;
+		increment = .02f;
+        currTime = spawnTime;
+        int test = Random.Range(0, weapons.Length);
+        this.gameObject.renderer.enabled = true;
+        this.gameObject.collider.enabled = true;
+		weapon = weapons[test];
+		weapon.Start();
+		this.gameObject.GetComponent<Light>().color = new Color(weapon.runeColor.r, weapon.runeColor.g, weapon.runeColor.b, .5f);
+        tempY = Random.value * 50;
+		
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		if (!this.gameObject.renderer.enabled)
+        {
+            currTime -= Time.deltaTime;
+        }
+        if (currTime <= 0)
+        {
+            Reset();
+        }
+
+        Bob();
+	}
+
+    void Bob()
+    {
+        Vector3 thePosition = rigidbody.position;
+
+        float diff = (Mathf.Sin(tempY))/450;
+
+        thePosition.y += diff;
+
+        tempY += bobSpeed;
+
+        rigidbody.position = thePosition;
+    }
+	
+	void OnTriggerEnter(Collider col)
+	{
+		Character wizard = col.gameObject.GetComponent<Character>();
+		if(wizard != null && this.gameObject.renderer.enabled)
+		{
+            this.gameObject.renderer.enabled = false;
+            this.gameObject.collider.enabled = false;
+            this.gameObject.GetComponent<Light>().color = new Color(0,0,0,0);
+			weapon.owner = wizard.gameObject;
+			wizard.gameObject.GetComponent<CharacterProjectile>().p = (Projectile)Instantiate(weapon);
+            tempY = Random.value * 50;
+			//weapon.Start();
+		}
+	}
+
+    void Reset()
+    {
+        rigidbody.position = start;
+        currTime = spawnTime;
+        int test = Random.Range(0, weapons.Length);
+        this.gameObject.renderer.enabled = true;
+        this.gameObject.collider.enabled = true;
+        weapon = weapons[test];
+        weapon.Start();
+        this.gameObject.GetComponent<Light>().color = new Color(weapon.runeColor.r, weapon.runeColor.g, weapon.runeColor.b, .5f);
+        tempY = Random.value * 50;
+    }
+}

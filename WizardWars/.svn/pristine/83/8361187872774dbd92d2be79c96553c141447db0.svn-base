@@ -1,0 +1,46 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class DoorScript : MonoBehaviour 
+{
+    public string sceneName;
+
+	// Use this for initialization
+	void Start () 
+    {
+	
+	}
+	
+	// Update is called once per frame
+	void Update () 
+    {
+	
+	}
+
+    public void GoToLevel()
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("MainMenuPlayer");
+        int count = 0;
+        List<Character> newPlayers = new List<Character>();
+        for (int i=0; i<players.Length; i++)
+        {
+            if (players [i].renderer.isVisible)
+            {
+                count++;
+                GameObject.DontDestroyOnLoad(players [i]);
+                players [i].AddComponent<ScreenWrap>();
+                newPlayers.Add(players [i].GetComponent<Character>());
+            }
+        }
+        if (count > 0)
+        {
+            //GameManager.setGamemode(indexOfTrue(gameChoices) + 1);
+            GameManager.isLoaded = false;
+            Application.LoadLevel(sceneName);
+            GameManager.setPlayers(newPlayers.ToArray());
+        }
+
+
+    }
+}

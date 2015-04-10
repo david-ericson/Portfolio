@@ -1,0 +1,22 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Rune.cs">
+    <Files>
+      <File FileName="Assets\MagicMissileProjectile.cs" Line="31" Column="43" />
+      <File FileName="Assets\RicochetMissileProjectile.cs" Line="34" Column="97" />
+      <File FileName="Assets\FireBall.cs" Line="29" Column="173" />
+      <File FileName="Assets\Fireblast.cs" Line="76" Column="1" />
+      <File FileName="Assets\SinCosProjectile.cs" Line="158" Column="1" />
+      <File FileName="Assets\ThreeRoundProjectile.cs" Line="66" Column="1" />
+      <File FileName="Assets\Magic.cs" Line="117" Column="22" />
+      <File FileName="Assets\Character.cs" Line="227" Column="10" />
+      <File FileName="Assets\GameManager.cs" Line="461" Column="76" />
+      <File FileName="Assets\Controller.cs" Line="188" Column="1" />
+      <File FileName="Assets\Rune.cs" Line="149" Column="5" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

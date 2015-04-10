@@ -1,0 +1,43 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class ScreenWrap : MonoBehaviour {
+
+	// Use this for initialization
+	void Start () {
+	
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		//X wrap
+		if(!this.gameObject.renderer.isVisible)
+		{
+		
+			Vector3 pos = this.gameObject.transform.position;
+			if(Camera.main.WorldToScreenPoint(new Vector3(pos.x-this.gameObject.renderer.bounds.size.x/2, pos.y,pos.z)).x > Screen.width)
+			{
+				Vector3 WfromS = Camera.main.WorldToScreenPoint(pos);
+				this.gameObject.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(-this.gameObject.renderer.bounds.size.x/2+this.gameObject.renderer.bounds.size.x/8, WfromS.y, WfromS.z));	
+			
+			}
+			else if(Camera.main.WorldToScreenPoint(new Vector3(pos.x+this.gameObject.renderer.bounds.size.x/2, pos.y, pos.z)).x< 0)
+			{
+				Vector3 WfromS = Camera.main.WorldToScreenPoint(pos);
+				this.gameObject.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width + this.gameObject.renderer.bounds.size.x/2-this.gameObject.renderer.bounds.size.x/8, WfromS.y, WfromS.z));				
+			}
+			pos = this.gameObject.transform.position;
+			//Y wrap
+			if(Camera.main.WorldToScreenPoint(new Vector3(pos.x, pos.y-this.gameObject.renderer.bounds.size.y/2, pos.z )).y > Screen.height)
+			{
+				Vector3 WfromS = Camera.main.WorldToScreenPoint(pos);
+				this.gameObject.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(WfromS.x, -this.gameObject.renderer.bounds.size.y/2+this.gameObject.renderer.bounds.size.y/8, WfromS.z));	
+			}
+			else if(Camera.main.WorldToScreenPoint(new Vector3(pos.x, pos.y-this.gameObject.renderer.bounds.size.y/2, pos.z)).y < 0)
+			{
+				Vector3 WfromS = Camera.main.WorldToScreenPoint(pos);
+				this.gameObject.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(WfromS.x, Screen.height + this.gameObject.renderer.bounds.size.y/2-this.gameObject.renderer.bounds.size.y/8, WfromS.z));	
+			}
+		}
+	}
+}

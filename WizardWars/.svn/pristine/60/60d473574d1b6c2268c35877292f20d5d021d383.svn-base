@@ -1,0 +1,30 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class SpikeTrap : MonoBehaviour {
+
+	// Use this for initialization
+	void Start () 
+    {
+	
+	}
+	
+	// Update is called once per frame
+	void Update () 
+    {
+	
+	}
+
+    void OnTriggerEnter(Collider col)
+    {
+        Character c = col.GetComponent<Character>();
+        if (c != null)
+        {
+            //if(col.collider.transform.position.y > collider.bounds.extents.y + transform.position.y - .01f)
+            //{
+                c.alterNumKills(-1);
+                c.Kill();
+            //}
+        }
+    }
+}

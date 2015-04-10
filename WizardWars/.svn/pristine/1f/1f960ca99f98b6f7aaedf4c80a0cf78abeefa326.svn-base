@@ -1,0 +1,45 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class MarathonCamera : MonoBehaviour {
+
+
+    public float movementSpeed;
+    public Vector3 endPos;
+    public GameObject background;
+    Vector3 backStart;
+    Vector3 backEnd;
+    Vector3 startPos;
+    Vector3 diff;
+    Vector3 backDiff;
+    float curLerp = 0;
+	// Use this for initialization
+	void Start () {
+        startPos = transform.position;
+        diff = endPos - startPos;
+
+        backStart = background.transform.position;
+        backEnd = (new Vector3(backStart.x + (endPos.x-startPos.x)*0.55f, backStart.y, backStart.z));
+        backDiff = backEnd - backStart;
+	}
+	
+	// Update is called once per frame
+	void Update () {
+        curLerp += movementSpeed * Time.deltaTime;
+        transform.position = startPos + (curLerp * diff);
+        //background.transform.position = backStart + (curLerp * backDiff);
+        if (curLerp > 1)
+        {
+            Vector3 tmp = endPos;
+            endPos = startPos;
+            startPos = tmp;
+            diff = endPos - startPos;
+            curLerp = 0;
+
+            Vector3 tmpb = backEnd;
+            backEnd = backStart;
+            backStart = tmpb;
+            backDiff = backEnd - backStart;
+        }
+	}
+}

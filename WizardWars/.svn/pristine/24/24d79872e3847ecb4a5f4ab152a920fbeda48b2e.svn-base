@@ -1,0 +1,22 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public abstract class Utility {
+
+
+	public float lifeTime;
+	public Controller controller;
+	public Rigidbody rigidBody;
+	public float countdown;
+	public float cooldown;
+	protected float curCooldown;
+	// Use this for initialization
+
+	// Update is called once per frame
+	public abstract void init();
+	public abstract void customUpdate ();
+
+	public abstract void Activate ();
+
+	public abstract void Deactivate ();
+}

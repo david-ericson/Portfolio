@@ -1,0 +1,33 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class Rune : MonoBehaviour {
+	public  Magic[] weapons;
+	private Vector3 start, end;
+	private float beta, increment;
+	private Magic weapon;
+	// Use this for initialization
+	void Start () {
+		start = gameObject.transform.position;
+		end = start + new Vector3(0, 2, 0);
+		beta = 0;
+		increment = .02f;
+		
+		weapon = weapons[Random.Range(0, weapons.Length)];
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+	
+	void OnCollisionEnter(Collision col)
+	{
+		Character wizard = col.collider.gameObject.GetComponent<Character>();
+		if(wizard != null)
+		{
+			Destroy(this.gameObject);
+			wizard.gameObject.GetComponent<Projectile>().bullet = weapon;
+		}
+	}
+}

@@ -1,0 +1,222 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class MenuSystem : MonoBehaviour {
+	public string[] gamemodes;
+	public string[] levels;
+	public Vector3 inGame;
+	public Vector3 outGame;
+	private bool firstFrame;
+	private bool choosingGamemode;
+	private bool choosingLevel;
+	private choice[] gameChoices;
+	private choice[] levelChoices;
+	GUIStyle labelStyle;
+	
+	struct choice 
+	{
+		public bool value;
+		public string name;
+		public string levelToLoad;
+	}
+	// Use this for initialization
+	void Start () {
+	firstFrame = true;
+		choosingGamemode = false;
+		choosingLevel = false;
+		gameChoices = new choice[gamemodes.Length];
+		levelChoices = new choice[levels.Length];
+		for(int i=0; i<gamemodes.Length; i++)
+		{
+			gameChoices[i] = new choice();
+			gameChoices[i].value = false;
+			gameChoices[i].name = gamemodes[i];
+		}
+		for(int i=0; i<levels.Length; i++)
+		{
+			levelChoices[i] = new choice();
+			levelChoices[i].value = false;
+			string[] split = levels[i].Split('/');
+			levelChoices[i].name = split[0];
+			levelChoices[i].levelToLoad = split[1];
+		}
+		
+		GameManager[] managers = GameObject.FindObjectsOfType<GameManager>();
+		if(managers.Length>1)
+		{
+			for(int i=1; i<managers.Length; i++)
+			{
+				GameObject.Destroy(managers[i]);
+			}
+		}
+		gameChoices[0].value = true;
+		levelChoices[0].value = true;
+		labelStyle = new GUIStyle();
+		labelStyle.fontSize = 12;
+		labelStyle.normal.textColor = new Color(1,0,0);
+	}
+	
+	void switchAllChoiceBools(choice[] choices, int stay)
+	{
+		for(int i=0; i<choices.Length; i++)
+		{
+			if(i != stay)
+			{
+				choices[i].value = false;
+			}
+		}
+	}
+	
+	choice getCurrChoice(choice[] choices)
+	{
+		choice ret = new choice();
+		for(int i=0; i<choices.Length; i++)
+		{
+			if(choices[i].value)
+			{
+				ret = choices[i];
+			}
+		}
+		return ret;
+	}
+	
+	void spawnPlayer(GameObject[] players, int playerID)
+	{
+		if(!players[playerID].renderer.isVisible)
+		{
+			players[playerID].transform.position = inGame;
+		}
+		else
+		{
+			players[playerID].transform.position = outGame;
+		}
+	}
+	
+	void resetPlayers()
+	{
+		GameObject[] players = GameObject.FindGameObjectsWithTag("MainMenuPlayer");
+		int numPlayers = 0;
+		if(players.Length != 4)
+		{
+			for(int i=0; i<players.Length; i++)
+			{
+				if(players[i].renderer.isVisible )
+				{
+					Destroy(players[i]);
+					numPlayers++;
+				}
+			}
+		}
+		players = GameObject.FindGameObjectsWithTag("MainMenuPlayer");
+		for(int i=numPlayers; i<players.Length;i++) 
+		{	
+			if(i < numPlayers*2)
+			{
+				spawnPlayer(players, i);
+			}
+		}
+		GameManager.hardReset();
+		GameManager.UnpauseThisGodForsakenGame();
+		print (Time.timeScale);
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		if(firstFrame)
+		{
+			resetPlayers();
+			firstFrame = false;	
+		}
+		GameObject[] players = GameObject.FindGameObjectsWithTag("MainMenuPlayer");
+		if(Input.GetKeyDown(KeyCode.A))
+		{
+			spawnPlayer(players, 0);
+		}
+		if(Input.GetKeyDown(KeyCode.S))
+		{
+			spawnPlayer(players, 1);
+		}
+		if(Input.GetKeyDown(KeyCode.D))
+		{
+			spawnPlayer(players, 2);
+		}
+		if(Input.GetKeyDown(KeyCode.F))
+		{
+			spawnPlayer(players, 3);
+		}
+	}
+	
+	int indexOfTrue(choice[] choices)
+	{
+		int index = -1;
+		for(int i=0; i<choices.Length && index == -1; i++)
+		{
+			index = (choices[i].value)?i:index;
+		}
+		return index;
+	}
+	
+	void OnGUI()
+	{
+		int height = Screen.height/25;
+		int width = 150;
+		int gap = 15;
+		int gapSoFar = 0;
+		int numGUIObjects = 6;
+		GUI.Box(new Rect(Screen.width/11, Screen.height/11, width+2*(Screen.width/10-Screen.width/11), numGUIObjects*(height+gap)+2*(Screen.height/10-Screen.height/11)), "");
+		GUI.Label(new Rect(Screen.width/10, Screen.height/10, width, height), "Choose Gamemode", labelStyle);
+		gapSoFar += height+gap;
+		for(int i=0; i<gameChoices.Length; i++)
+		{
+			if(GUI.Toggle(new Rect(Screen.width/10, Screen.height/10+gapSoFar, width, height), gameChoices[i].value, gameChoices[i].name))
+			{
+				gameChoices[i].value = true;
+				switchAllChoiceBools(gameChoices, i);
+			}
+			gapSoFar += height+gap;
+		}
+		GUI.Label(new Rect(Screen.width/10, Screen.height/10+gapSoFar, width, height), "Choose Level", labelStyle);
+		gapSoFar += height+gap;
+		for(int i=0; i<levelChoices.Length; i++)
+		{
+			if(GUI.Toggle(new Rect(Screen.width/10, Screen.height/10+gapSoFar, width, height), levelChoices[i].value, levelChoices[i].name))
+			{
+				levelChoices[i].value = true;
+				switchAllChoiceBools(levelChoices, i);
+			}
+			gapSoFar += height+gap;
+		}
+		gapSoFar += gap;
+		if(GUI.Button(new Rect(Screen.width/10, Screen.height/10+gapSoFar, width, height*2), "Start Game"))
+		{
+			choice level = getCurrChoice(levelChoices);
+			GameObject[] players = GameObject.FindGameObjectsWithTag("MainMenuPlayer");
+			int count = 0;
+			List<Character> newPlayers = new List<Character>();
+			for(int i=0; i<players.Length; i++)
+			{
+				if(players[i].renderer.isVisible)
+				{
+					count++;
+					GameObject.DontDestroyOnLoad(players[i]);
+					players[i].AddComponent<ScreenWrap>();
+					newPlayers.Add(players[i].GetComponent<Character>());
+				}
+			}
+			if(count > 0)
+			{
+				GameManager.setGamemode(indexOfTrue(gameChoices)+1);
+				GameManager.isLoaded = false;
+				Application.LoadLevel(level.levelToLoad);
+				GameManager.setPlayers(newPlayers.ToArray());
+			}
+		}
+		gapSoFar += 2*height+gap;
+		/*if(GUI.Button(new Rect(Screen.width/10, Screen.height/10+gapSoFar, width, height*2), "Close"))
+		{
+			Application.Quit();
+		}*/
+	}
+}
+

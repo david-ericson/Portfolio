@@ -1,0 +1,111 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class LighteningSpawn : MonoBehaviour {
+
+	// Use this for initialization
+
+    Vector3 firstP;
+    float firstM;
+    Vector3 secondP;
+    float secondM;
+    float thirdM;
+    Vector3 start;
+    float lerpSpeed = 50.0f;
+    float curLerp = 0.0f;
+
+	public ParticleSystem explosion;
+
+	public Character player;
+
+    float wait = 0.0f;
+
+    Vector3 target;
+	void Start () {
+		//On start, place yourself somewhere above the spawn point.
+		//Then calculate the path to the spawn point with one backtrack at an angle.
+		//Neato.
+		//I think I've got this.
+
+		//GetComponentInChildren<ParticleSystem>().startColor = player.renderer.material.color;
+		target = transform.position + new Vector3 (0, 0, -3);
+
+		bool doneYet = false;
+		Vector3 spoint = Vector3.zero;
+		while (!doneYet || spoint.x < 0.04 || spoint.x > 0.96)
+		{
+			doneYet = true;
+			start = target - new Vector3 (Random.Range (-5, 5), 0, 0);
+			spoint = Camera.main.WorldToViewportPoint(start);
+		}
+
+		//Now make the start.y the perfect height.
+		spoint = new Vector3 (spoint.x, 1.05f, spoint.z);
+		start = Camera.main.ViewportToWorldPoint (spoint);
+
+        transform.position = start;
+        firstP = (transform.position + ((target - transform.position) * 0.5f));
+        firstP = new Vector3(firstP.x + (Random.Range(-1.0f, 1.0f)), firstP.y + (Random.Range(-1.0f, 1.0f)), firstP.z);
+
+        secondP = firstP + new Vector3(Random.Range(-2.0f, 2.0f), Random.Range(-2.0f, 2.0f), firstP.z);
+
+        firstM = (firstP - start).magnitude;
+        secondM = (secondP - firstP).magnitude;
+        thirdM = (target - secondP).magnitude;
+		/*
+		Vector3 oldTarget = target;
+		Vector3 oldFir = firstP;
+		Vector3 oldSec = secondP;
+		Vector3 oldStart = start;
+
+		float oldFM = firstM;
+		float oldSM = secondM;
+		float oldTM = thirdM;
+
+		target = oldStart;
+		firstP = oldSec;
+		secondP = oldFir;
+		start = oldTarget;
+		firstM = oldTM;
+		secondM = oldSM;
+		thirdM = oldFM;
+		*/
+	}
+	
+	// Update is called once per frame
+	void Update () {
+        if (wait > 0)
+        {
+            wait -= Time.deltaTime;
+            return;
+        }
+
+        if (curLerp < 1.0f)
+        {
+            curLerp += lerpSpeed/firstM * Time.deltaTime;
+            transform.position = start + (firstP - start) * curLerp;
+        } else if (curLerp < 2.0f)
+        {
+            curLerp += lerpSpeed/secondM * Time.deltaTime;
+            transform.position = firstP + (secondP - firstP) * (curLerp-1.0f);
+        } else if (curLerp < 3.0f)
+        {
+            curLerp += lerpSpeed/thirdM * Time.deltaTime;
+            transform.position = secondP + (target - secondP) * (curLerp-2.0f);
+        }
+
+        if (curLerp > 3.0f && curLerp < 100.0f)
+        {
+            this.GetComponentInChildren<ParticleSystem>().Stop();
+            curLerp = 10000.0f;
+
+			(player).Spawn();
+			ParticleSystem ps = (ParticleSystem)Instantiate (explosion, target, Quaternion.identity);
+			ps.startColor = player.renderer.material.color;
+			Destroy (ps, explosion.duration);
+
+
+            Destroy(this, 5);
+        }
+	}
+}

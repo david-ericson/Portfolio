@@ -1,0 +1,79 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class Magic : MonoBehaviour
+{
+
+    public float timeOut;
+    //public Vector3 velocity;
+    public float Speed;
+    public float coolDown;
+    public int numberOfBounces;
+    public int characterNumber;
+    float currentTime;
+    Vector3 lastVelocity;
+    float bounciness;
+
+
+    // Use this for initialization
+    void Start()
+    {
+        rigidbody.velocity *= Speed;
+        currentTime = 0;
+        bounciness = 1;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        Character guy = collision.collider.gameObject.GetComponent<Character>();
+        if (guy != null)
+        {
+            if (guy != null && !guy.getInvincible())
+            {
+                if (characterNumber == guy.getId())
+                {
+                    //guy.alterNumKills(-1);
+                }
+                else
+                {
+                    Destroy(this.gameObject);
+                    GameManager.getPlayer(characterNumber).alterNumKills(1);
+                    guy.Kill();
+                }
+            }
+            if( guy.getInvincible())
+            {
+                Destroy(this.gameObject);
+            }
+        }
+
+        if(collision.collider.gameObject.name != "Magic")
+        {
+            
+            if (numberOfBounces > 0 && currentTime>0.01)
+            {
+                numberOfBounces--;
+                //BOUNCE.... 
+                //Manually... Something to do with dot.
+            }
+            else if(numberOfBounces==0)
+            {
+                Destroy(this.gameObject);
+            }
+        }
+    }
+    
+    // Update is called once per frame
+    void Update()
+    {
+        //this.rigidbody.transform.Translate((velocity * Speed) * Time.deltaTime);
+
+        currentTime += Time.deltaTime;
+
+        if (timeOut <= currentTime)
+        {
+            Destroy(this.gameObject);
+        }
+        lastVelocity = rigidbody.velocity;
+    }
+}

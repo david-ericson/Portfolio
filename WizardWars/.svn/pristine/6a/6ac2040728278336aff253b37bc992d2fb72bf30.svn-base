@@ -1,0 +1,41 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class Rune : MonoBehaviour {
+	public  Projectile[] weapons;
+	private Vector3 start, end;
+	private float beta, increment;
+	private Projectile weapon;
+	
+	// Use this for initialization
+	void Start () {
+		start = gameObject.transform.position;
+		end = start + new Vector3(0, 2, 0);
+		beta = 0;
+		increment = .02f;
+		
+		int test = Random.Range(0, weapons.Length-1);
+		weapon = weapons[Random.Range(0, weapons.Length-1)];
+		weapon.Start();
+		this.gameObject.GetComponent<Light>().color = weapon.runeColor;
+		
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+	
+	void OnTriggerEnter(Collider col)
+	{
+		Character wizard = col.gameObject.GetComponent<Character>();
+		if(wizard != null)
+		{
+			Destroy(this.gameObject);
+			weapon.owner = wizard.gameObject;
+			wizard.gameObject.GetComponent<CharacterProjectile>().p = weapon;
+			
+			//weapon.Start();
+		}
+	}
+}
